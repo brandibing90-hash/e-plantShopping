@@ -1,13 +1,20 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import './index.css'
-import { Provider } from 'react-redux'
-import store from './store.js'
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <Provider store={store}>
-    <App />
-    </Provider>
-  </React.StrictMode>,
-)
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { addItem } from '../features/cart/CartSlice';
+
+const PlantItem = ({ plant }) => {
+  const dispatch = useDispatch();
+
+  const handleAddToCart = () => {
+    dispatch(addItem(plant));
+  };
+
+  return (
+    <div>
+      <h3>{plant.name}</h3>
+      <button onClick={handleAddToCart}>Add to Cart</button>
+    </div>
+  );
+};
+
+export default PlantItem;

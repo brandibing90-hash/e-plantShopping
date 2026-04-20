@@ -1,68 +1,61 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeItem, updateQuantity } from './CartSlice';
-import './CartItem.css';
+import { incrementQuantity, decrementQuantity, removeItem } from '../redux/cartActions'; // adjust path as needed
+import { useNavigate } from 'react-router-dom';
 
-const CartItem = ({ onContinueShopping }) => {
+const CartItems = () => {
   const cart = useSelector(state => state.cart.items);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  // Calculate total amount for all products in the cart
+  // Calculate total cost of all items in cart
   const calculateTotalAmount = () => {
- 
+    let total = 0;
+    cart.forEach(item => {
+      const cost = parseFloat(item.cost);
+      total += item.quantity * cost;
+    });
+    return total.toFixed(2);
   };
 
-  const handleContinueShopping = (e) => {
-   
+  const handleIncrement = (id) => {
+    dispatch(incrementQuantity(id));
   };
 
-
-
-  const handleIncrement = (item) => {
+  const handleDecrement = (id) => {
+    dispatch(decrementQuantity(id));
   };
 
-  const handleDecrement = (item) => {
-   
+  const handleRemove = (id) => {
+    dispatch(removeItem(id));
   };
 
-  const handleRemove = (item) => {
-  };
-
-  // Calculate total cost based on quantity for an item
-  const calculateTotalCost = (item) => {
+  const handleContinueShopping = () => {
+    navigate('/shop'); // or whatever your shopping page route is
   };
 
   return (
-    <div className="cart-container">
-      <h2 style={{ color: 'black' }}>Total Cart Amount: ${calculateTotalAmount()}</h2>
-      <div>
-        {cart.map(item => (
-          <div className="cart-item" key={item.name}>
-            <img className="cart-item-image" src={item.image} alt={item.name} />
-            <div className="cart-item-details">
-              <div className="cart-item-name">{item.name}</div>
-              <div className="cart-item-cost">{item.cost}</div>
-              <div className="cart-item-quantity">
-                <button className="cart-item-button cart-item-button-dec" onClick={() => handleDecrement(item)}>-</button>
-                <span className="cart-item-quantity-value">{item.quantity}</span>
-                <button className="cart-item-button cart-item-button-inc" onClick={() => handleIncrement(item)}>+</button>
-              </div>
-              <div className="cart-item-total">Total: ${calculateTotalCost(item)}</div>
-              <button className="cart-item-delete" onClick={() => handleRemove(item)}>Delete</button>
-            </div>
+    <div>
+      <h2>Your Cart</h2>
+      {cart.length === 0 ? (
+        <p>Your cart is empty.</p>
+      ) : (
+        cart.map(item => (
+          <div key={item.id} style={{ borderBottom: '1px solid #ccc', marginBottom: '10px' }}>
+            <h3>{item.name}</h3>
+            <p>Price: ${parseFloat(item.cost).toFixed(2)}</p>
+            <p>Quantity: {item.quantity}</p>
+            <p>Subtotal: ${(item.quantity * parseFloat(item.cost)).toFixed(2)}</p>
+            <button onClick={() => handleIncrement(item.id)}>+</button>
+            <button onClick={() => handleDecrement(item.id)} disabled={item.quantity <= 1}>-</button>
+            <button onClick={() => handleRemove(item.id)}>Remove</button>
           </div>
-        ))}
-      </div>
-      <div style={{ marginTop: '20px', color: 'black' }} className='total_cart_amount'></div>
-      <div className="continue_shopping_btn">
-        <button className="get-started-button" onClick={(e) => handleContinueShopping(e)}>Continue Shopping</button>
-        <br />
-        <button className="get-started-button1">Checkout</button>
-      </div>
+        ))
+      )}
+      <h3>Total: ${calculateTotalAmount()}</h3>
+      <button onClick={handleContinueShopping}>Continue Shopping</button>
     </div>
   );
 };
 
-export default CartItem;
-
-
+export default CartItems;
